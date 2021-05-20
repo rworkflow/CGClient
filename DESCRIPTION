@@ -1,0 +1,22 @@
+Package: CGClient
+Title: Cancer Genomics Cloud client
+Version: 0.0.1
+Authors@R: 
+    person(given = "Qiang",
+           family = "Hu",
+           role = c("aut", "cre"),
+           email = "qiang.hu@roswellpark.org")
+Description: An R client for the Cancer Genomics Clould (CGC) to manager files, submit and run tasks.
+Depends: httr
+Imports: yaml, jsonlite, methods
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Suggests: 
+    testthat (>= 3.0.0),
+    rmarkdown,
+    knitr
+Config/testthat/edition: 3
+VignetteBuilder: knitr
