@@ -13,13 +13,44 @@ get_file <- function(id, key = NULL){
 
 #' list folder
 #' @param id The folder ID to list.
+#' @param project The prject ID.
+#' @param recursive Whether to list the folder recursively.
 #' @param key The authentication token.
+#' @return A data.frame of contents in the folder.
 #' @export
-list_folder <- function(id, key = NULL){
+list_folder <- function(id = NULL, project = NULL, recursive = FALSE, key = NULL){
     key <- .check_auth(key)
-    ff <- GET(paste0("https://cgc-api.sbgenomics.com/v2/files/", id, "/list"),
-                add_headers("X-SBG-Auth-Token" = key,
-                            "Content-Type" = "application/json"))
+    if(!is.null(project) & is.null(id)){
+        url  <- paste0("https://cgc-api.sbgenomics.com/v2/files?project=", project)
+    }else{
+        url <- paste0("https://cgc-api.sbgenomics.com/v2/files/", id, "/list")
+    }
+    ff <- GET(url,
+              add_headers("X-SBG-Auth-Token" = key,
+                          "Content-Type" = "application/json"),
+              query = list(offset = 0, limit = 100))
     ff <- content(ff)
-    return(responseList(ff))
+    fcount <- length(ff$items)
+    if(fcount > 0 && fcount %% 100 == 0){
+        fff <- GET(url,
+                   add_headers("X-SBG-Auth-Token" = key,
+                               "Content-Type" = "application/json"),
+                   query = list(offset = fcount, limit = 100))
+        fff <- content(fff)
+        ff$items <- c(ff$items, fff$items)
+        fcount  <- length(ff$items)
+    }
+    fd <- data.frame(do.call(rbind, ff$items))
+    if(recursive){
+        if(nrow(fd) > 0){
+            for(i in seq(nrow(fd))){
+                if(fd$type[[i]] == "folder"){
+                    fd1 <- list_folder(id = fd$id[[i]], recursive = recursive, key = key)
+                    fd$type[[i]] <- "Folder"
+                    fd <- rbind(fd, fd1)
+                }
+            }
+        }
+    }
+    return(fd)
 }
