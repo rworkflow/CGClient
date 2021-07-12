@@ -8,12 +8,13 @@
 #' @param inputs The list of input parameters for the App.
 #' @param batch_input The ID from the inputs for batch run.
 #' @param batch_by The type of batch.
+#' @param extlist The other requests in a list.
 #' @return A response list.
 #' @importFrom methods is
 #' @importFrom jsonlite toJSON
 #' @export
 new_task <- function(project, app, inputs, batch_input = NULL, batch_by = NULL,
-                     key = NULL){
+                     key = NULL, extlist = NULL){
     key <- .check_auth(key)
     inputsList <- lapply(inputs, function(x){
         if(is(x, "list")){
@@ -37,6 +38,9 @@ new_task <- function(project, app, inputs, batch_input = NULL, batch_by = NULL,
                    inputs = inputsList,
                    batch_input = batch_input,
                    batch_by = batch_by)
+    if(!is.null(extlist)){
+        Inputs <- c(Inputs, extlist)
+    }
                    
     Inputs <- Inputs[lengths(Inputs)>0]
     

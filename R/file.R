@@ -46,11 +46,12 @@ list_folder <- function(id = NULL, project = NULL, recursive = FALSE, key = NULL
             for(i in seq(nrow(fd))){
                 if(fd$type[[i]] == "folder"){
                     fd1 <- list_folder(id = fd$id[[i]], recursive = recursive, key = key)
-                    fd$type[[i]] <- "Folder"
+                    ## fd$type[[i]] <- "Folder"
                     fd <- rbind(fd, fd1)
                 }
             }
         }
     }
+    fd <- data.frame(apply(fd, 2, unlist))
     return(fd)
 }
