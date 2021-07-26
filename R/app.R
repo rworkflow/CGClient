@@ -13,7 +13,7 @@ get_app <- function(project, app_id, key = NULL){
     return(responseList(app1))
 }
 
-#' add App
+#' add App using sbpack
 #'
 #' @param project TThe project ID in the following format: {project_owner}/{project}.
 #' @param app The app JSON file to upload. Or a `cwlProcess` from `Rcwl`.
@@ -21,46 +21,40 @@ get_app <- function(project, app_id, key = NULL){
 #' @export
 add_app <- function(project, app, app_id, key = NULL){
     key <- .check_auth(key)
+    if(!file.exists(Sys.which("sbpack"))){
+        cl <- basiliskStart(env_sbpack)
+        basiliskStop(cl)
+    }
     if(is.character(app) && file.exists(app)){
         app_file <- app
     }else if(is(app, "cwlProcess")){
         if(is(app, "cwlWorkflow")){
-            app_file <- cwlpack(app)
+            app_file <- cwlpack(app, app_id)
         }else{
-            jn <- toJSON(Rcwl:::cwlToList(app), auto_unbox = TRUE)
-            app_file <- paste0(tempfile(), ".json")
-            write(jn, app_file)
+            app_file <- writeCWL(app, app_id, tempdir())[1]
         }
     }
-    app0 <- get_app(project, app_id)
-    if("revision" %in% names(app0)){
-        vid <- app0$revision + 1
-    }else{
-        vid <- 0
-    }
-    
-    app1 <- POST(paste0("https://cgc-api.sbgenomics.com/v2/apps/", project,
-                        "/", app_id, "/", vid, "/raw"),
-                 add_headers("X-SBG-Auth-Token" = key,
-                             "Content-Type" = "application/json"),
-                 body = upload_file(app_file),
-                 encode = "json")
-    app1 <- content(app1)
-    return(responseList(app1))
+    re <- system(paste0("sbpack cgc ", project, "/", app_id, " ", app_file))
+    return(paste0(project, "/", app_id))
 }
 
 
 #' require sbpack to wrap cwl workflow
-#' @importFrom yaml read_yaml
+#' @param cwl The Rcwl object.
+#' @param name The 
+#' @export
 cwlpack <- function(cwl, name = NULL){
+    if(!file.exists(Sys.which("cwlpack"))){
+        cl <- basiliskStart(env_sbpack)
+        basiliskStop(cl)
+    }
+
     if(is.null(name)){
         name = deparse(substitute(cwl))
     }
     app_file <- writeCWL(cwl, prefix = name)[1]
-    tmp <- paste0(tempfile(), ".cwl")
+    tmp <- sub(".cwl", "_pack.cwl", app_file)
     re <- system(paste("cwlpack", app_file, ">", tmp))
     stopifnot(re == 0)
-    tmp_j <- sub(".cwl", ".json", tmp)
-    write(toJSON(read_yaml(tmp), auto_unbox = TRUE), tmp_j)
-    return(tmp_j)
+    return(tmp)
 }

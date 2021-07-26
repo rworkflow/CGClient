@@ -8,7 +8,7 @@ Authors@R:
            email = "qiang.hu@roswellpark.org")
 Description: An R client for the Cancer Genomics Clould (CGC) to manager files, submit and run tasks.
 Depends: httr
-Imports: yaml, jsonlite, methods
+Imports: yaml, jsonlite, methods, basilisk
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
@@ -20,3 +20,4 @@ Suggests:
     knitr
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+StagedInstall: no
