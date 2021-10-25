@@ -18,10 +18,15 @@ new_task <- function(project, app, inputs, batch_input = NULL, batch_by = NULL,
     key <- .check_auth(key)
     inputsList <- lapply(inputs, function(x){
         if(is(x, "list")){
-            if(length(x$id) > 1){
-                lapply(x$id, function(i)list(class = "File", path = i))
+            if(!"class" %in% names(x)){
+                ctype <- "File"
             }else{
-                list(class = "File",
+                ctype <- x$class
+            }
+            if(length(x$id) > 1 | is(x$id, "list")){
+                lapply(x$id, function(i)list(class = ctype, path = i))
+            }else{
+                list(class = ctype,
                      path = x$id)
             }
         }else{

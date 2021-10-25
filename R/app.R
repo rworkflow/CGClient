@@ -17,10 +17,22 @@ get_app <- function(project, app_id, key = NULL){
 #'
 #' @param project TThe project ID in the following format: {project_owner}/{project}.
 #' @param app The app JSON file to upload. Or a `cwlProcess` from `Rcwl`.
+#' @param app_id The app ID.
+#' @param key The Authentication Token of your account from CGC if not auth.
+#' @param update_key Whether to update key.
 #' @importFrom Rcwl writeCWL
 #' @export
-add_app <- function(project, app, app_id, key = NULL){
+add_app <- function(project, app, app_id, key = NULL, update_key = FALSE){
     key <- .check_auth(key)
+    
+    if(update_key | !file.exists("~/.sevenbridges/credentials")){
+        dir.create("~/.sevenbridges", showWarnings = FALSE)
+        cre <- c("[cgc]",
+                 "api_endpoint = https://cgc-api.sbgenomics.com/v2",
+                 paste0("auth_token = ", key))
+        writeLines(cre, "~/.sevenbridges/credentials")
+    }
+    
     if(!file.exists(Sys.which("sbpack"))){
         cl <- basiliskStart(env_sbpack)
         basiliskStop(cl)

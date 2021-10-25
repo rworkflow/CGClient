@@ -4,7 +4,15 @@
 \alias{new_task}
 \title{create new task}
 \usage{
-new_task(project, app, inputs, batch_input = NULL, batch_by = NULL, key = NULL)
+new_task(
+  project,
+  app,
+  inputs,
+  batch_input = NULL,
+  batch_by = NULL,
+  key = NULL,
+  extlist = NULL
+)
 }
 \arguments{
 \item{project}{The project ID in the following format: {project_owner}/{project}.}
@@ -18,6 +26,8 @@ new_task(project, app, inputs, batch_input = NULL, batch_by = NULL, key = NULL)
 \item{batch_by}{The type of batch.}
 
 \item{key}{The Authentication Token.}
+
+\item{extlist}{The other requests in a list.}
 }
 \value{
 A response list.

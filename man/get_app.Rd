@@ -4,12 +4,12 @@
 \alias{get_app}
 \title{get App details}
 \usage{
-get_app(project, app, key = NULL)
+get_app(project, app_id, key = NULL)
 }
 \arguments{
 \item{project}{The project ID in the following format: {project_owner}/{project}.}
 
-\item{app}{The ID for the app you are querying.}
+\item{app_id}{The ID for the app you are querying.}
 
 \item{key}{The Authentication Token.}
 }

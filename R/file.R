@@ -40,7 +40,8 @@ list_folder <- function(id = NULL, project = NULL, recursive = FALSE, key = NULL
         ff$items <- c(ff$items, fff$items)
         fcount  <- length(ff$items)
     }
-    fd <- data.frame(do.call(rbind, ff$items))
+    items <- lapply(ff$items, unlist)
+    fd <- data.frame(do.call(rbind, items))
     if(recursive){
         if(nrow(fd) > 0){
             for(i in seq(nrow(fd))){
@@ -52,6 +53,6 @@ list_folder <- function(id = NULL, project = NULL, recursive = FALSE, key = NULL
             }
         }
     }
-    fd <- data.frame(apply(fd, 2, unlist))
+    ## fd <- data.frame(apply(fd, 2, unlist))
     return(fd)
 }
